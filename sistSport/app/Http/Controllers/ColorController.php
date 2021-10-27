@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade as PDF;
 use App\Http\Requests;
-use App\Categoria;
+use App\Color;
 use Illuminate\Support\Facades\Redirect;
-use App\Http\Requests\CategoriaFormResquest;
+use App\Http\Requests\ColorFormRequest;
 use DB;
 
-class CategoriaController extends Controller
+class ColorController extends Controller
 {
     public function __construct(){
 
@@ -24,7 +23,7 @@ class CategoriaController extends Controller
             $query=trim($request->get('searchText'));
 
             //Consulta a la base de datos
-            $categorias=DB::table('categorias')
+            $colores=DB::table('colores')
             ->where('nombre','LIKE','%'.$query.'%')
             ->where('condicion','=','1')
             ->orderBy('id','desc')
@@ -36,60 +35,60 @@ class CategoriaController extends Controller
                     return $this->download($categorias);
             }
   
-            return view('almacen.categoria.index',["categorias"=>$categorias,"searchText"=>$query]);
+            return view('almacen.colores.index',["colores"=>$categorias,"searchText"=>$query]);
         }
     }
 
     public function create(){
-            return view('almacen.categoria.create');
+            return view('almacen.colores.create');
     }
 
-    public function store(CategoriaFormResquest $request){
-            $categoria = new Categoria;
+    public function store(ColorFormResquest $request){
+            $categoria = new Color;
             $categoria->nombre=$request->get('nombre');
             $categoria->condicion='1';
             $categoria->save();
 
-            return Redirect::to('almacen/categoria');
+            return Redirect::to('almacen/color');
     }
 
     public function show($id){
-        $categoria=DB::table('categorias')->where('idcategoria','=',$id);
+        $categoria=DB::table('colores')->where('id','=',$id);
         
-        return view("almacen.categoria.show",["categoria"=>$categoria]);
+        return view("almacen.color.show",["color"=>$categoria]);
     }
 
     public function edit($id){
-        $categoria=DB::table('categorias')->find($id);
+        $categoria=DB::table('colores')->find($id);
         
-        return view("almacen.categoria.edit",["categoria"=>$categoria]);
+        return view("almacen.color.edit",["color"=>$categoria]);
     }
     
     public function update(CategoriaFormResquest $request,$id){
-        $categoria=Categoria::FindOrFail($id);
+        $categoria=Color::FindOrFail($id);
         $categoria->nombre=$request->get('nombre');
         $categoria->update();
 
-        return Redirect::to('almacen/categoria');
+        return Redirect::to('almacen/color');
     }
 
     public function destroy($id){
-        $categoria=Categoria::FindOrFail($id);
+        $categoria=Color::FindOrFail($id);
         $categoria->condicion='0';
         $categoria->update();
-        return Redirect::to('almacen/categoria');
+        return Redirect::to('almacen/color');
     }
 
-    public function download($categorias)
+    public function download($color)
     {
         $pdf = \App::make('dompdf.wrapper');
         
         $data = [
-            'categorias'    =>   $categorias
+            'color'    =>   $color
         ];
         $pdf->setPaper('A4', 'portrait');
 
-        $pdf->loadView('reportes.categoria', $data);
+        $pdf->loadView('reportes.color', $data);
         return $pdf->stream('mi-archivo.pdf');
     }
 }
