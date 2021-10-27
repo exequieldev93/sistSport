@@ -44,6 +44,7 @@
             #logo {
             float: left;
             margin-top: 8px;
+            
             }
 
             #logo img {
@@ -235,11 +236,11 @@
     <header class="clearfix">
         <!--Logo-->  
         <div id="logo">
-            <img src="logo.png" alt="Logo">
+            <img src="C:\Users\Usuario\Desktop\Trabajo Final\5_Sistema\sistSport\public\img\edificios.jpeg" alt="Logo">
         </div>
         <!--Empresa-->
         <div id="company">
-            <h2 class="name">Nombre Empresa</h2>
+            <h2 class="name">Nombre Empresa: </h2>
             <div>Direccion:</div>
             <div>Telefono:</div>
             <div>Correo:</div>
@@ -250,12 +251,13 @@
     <main>
        <div class="clearfix">
             <div id="logo" >
-                <div >Generado por:</div>
-                <div>Fecha: </div>
+                <div>Generado por:  {{$nombre ?? Auth::user()->name}}</div>
+                <div>Fecha:         {{$fecha ?? now()->format('d/m/Y')}}</div>
+                <div>Hora:          {{$Hora ?? now()->format(' H:i:s')}}</div>
             </div> 
     
             <div id="company">
-                
+                <h2  class="name">Filtro de Categoria</h2>
                 <div class="date">Fecha Desde: 01/06/2014</div>
                 <div class="date">Fecha Hasta: 30/06/2014</div>
             </div>
@@ -277,9 +279,9 @@
         -->
         </thead>
         <tbody>
-            @foreach ($categorias as $cat)
+            @foreach ($categorias as $i => $cat)
             <tr>
-                <td >{{$cat->id}}</td>
+                <td >{{$i+1}}</td>
                 <td class="desc">{{$cat->nombre}}</td>
             </tr>
             @endforeach
@@ -296,7 +298,7 @@
             $x = ($pdf->get_width() - $width);
             $y = $pdf->get_height() - 35;
             $pdf->page_text($x, $y, $text, $font, $size);
-            $pdf->page_text(40, $y, "Generado por: ".Auth::user()->name." - ".now()->format('d/m/Y H:i:s'), $font, $size);
+            
         }
     </script>
 

@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Prenda;
+use App\Empresa;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Input;
 use App\Http\Requests\PrendaFormRequest;
 use DB;
+
 
 class PrendaController extends Controller
 {
@@ -24,56 +26,98 @@ class PrendaController extends Controller
 
             //Consulta a la base de datos
             $prendas=DB::table('prendas as p')
-            ->join('categorias as c','a.idCategoria','=','c.id')
-            ->select('a.idCategoria','a.nombre','a.talale','a.marca','a.color','a.imagen','c.nombre as categoria','a.esstado')
-            ->where('nombre','LIKE','%'.$query.'%')
-            ->orderBy('a.id','desc')
+            ->join('categorias as c','p.idCategoria','=','c.id')
+            ->select('p.id as idPrendas','p.idCategoria','p.nombre','p.talle','p.color','p.imagen','c.nombre as categoria','p.estado')
+            ->where('p.nombre','LIKE','%'.$query.'%')
+            ->orwhere('c.nombre','LIKE','%'.$query.'%')
+            ->orderBy('p.id','desc')
             ->paginate(7);
-
-            //
             
-            return view('almacen.prendas.index',["prendas"=>$prendas,"searchText"=>$query]);
+
+            if($request->exists('pdf')){
+                $empresa = Empresa::findOrFail(23);
+                return $this->download($prendas,$empresa);
+            }
+            
+            return view('almacen.prenda.index',["prendas"=>$prendas,"searchText"=>$query]);
         }
     }
 
     public function create(){
-            $categorias=DB::table('categoria')->where('condicion','=','1')->get();
-            return view('almacen.categoria.create',["categorias"=>$categorias]);
+            $categorias=DB::table('categorias')->where('condicion','=','1')->get();
+            return view('almacen.prenda.create',["categorias"=>$categorias]);
     }
 
-    public function store(CategoriaFormResquest $request){
-            $categoria = new Categoria;
-            $categoria->nombre=$request->get('nombre');
-            $categoria->condicion='1';
-            $categoria->save();
+    public function store(PrendaFormRequest $request){
 
-            return Redirect::to('almacen/categoria');
+            $prendas = new Prenda;
+            $prendas->idCategoria=$request->get('idCategoria');
+            $prendas->nombre=$request->get('nombre');
+            $prendas->talle=$request->get('talle');
+            $prendas->color=$request->get('color');
+            $prendas->estado='Activo';
+           
+            if($request->hasfile('imagen')!=null){
+                $file=$request->file('imagen');
+                $file->move(public_path().'\imagenes\prendas\\',$file->getClientOriginalName());
+            }
+            $prendas->imagen=$file->getClientOriginalName();
+            $prendas->save();
+
+            return Redirect::to('almacen/prenda');
     }
 
     public function show($id){
-        $categoria=DB::table('categorias')->where('idcategoria','=',$id);
+        $prendas=DB::table('prendas')->where('idcategoria','=',$id);
         
-        return view("almacen.categoria.show",["categoria"=>$categoria]);
+        return view("almacen.prenda.show",["prendas"=>$prendas]);
     }
 
     public function edit($id){
-        $categoria=DB::table('categorias')->find($id);
+        $prenda=Prenda::findOrFail($id);
+        $categorias=DB::table('categorias')->where('condicion','=','1')->get();
         
-        return view("almacen.categoria.edit",["categoria"=>$categoria]);
+        return view("almacen.prenda.edit",["prenda"=>$prenda,"categorias"=>$categorias]);
     }
     
-    public function update(CategoriaFormResquest $request,$id){
-        $categoria=Categoria::FindOrFail($id);
-        $categoria->nombre=$request->get('nombre');
-        $categoria->update();
-
-        return Redirect::to('almacen/categoria');
+    public function update(PrendaFormRequest $request,$id){
+        $prenda=Prenda::findOrFail($id);
+        $prenda->idCategoria=$request->get('idCategoria');
+        $prenda->nombre=$request->get('nombre');
+        $prenda->talle=$request->get('talle');
+        
+        $prenda->color=$request->get('color');
+        $prenda->estado='Activo';
+        
+           
+        if($request->hasfile('imagen')!=null){
+            $file=$request->file('imagen');
+            $file->move(public_path().'\imagenes\prendas\\',$file->getClientOriginalName());
+            $prenda->imagen=$file->getClientOriginalName();
+        }
+        
+        $prenda->update();
+        return Redirect::to('almacen/prenda');
     }
 
     public function destroy($id){
-        $categoria=Categoria::FindOrFail($id);
-        $categoria->condicion='0';
-        $categoria->update();
-        return Redirect::to('almacen/categoria');
+        $prenda=Prenda::findOrFail($id);
+        $prenda->estado='Inactivo';
+        $prenda->update();
+        return Redirect::to('almacen/prenda');
+    }
+
+    public function download($prendas, Empresa $empresa)
+    {
+        $pdf = \App::make('dompdf.wrapper');
+        
+        $data = [
+            'prendas'    =>   $prendas,
+            'empresa'    =>   $empresa
+        ];
+        $pdf->setPaper('A4', 'portrait');
+
+        $pdf->loadView('reportes.prenda', $data);
+        return $pdf->stream('mi-archivo.pdf');
     }
 }

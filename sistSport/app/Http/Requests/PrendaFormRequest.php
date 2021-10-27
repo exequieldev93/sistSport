@@ -27,10 +27,9 @@ class PrendaFormRequest extends FormRequest
             'idCategoria'=>'required',
             'nombre' =>'required|max:45',
             'talle' =>'required|max:45',
-            'marca' => 'required|max:45',
             'color' => 'max:45',
-            'estado'=> 'required',
-            'imagen'=> 'mimes:jpeg,bmp,png'
+            'estado'=> 'max:15',
+            
 
         ];
     }

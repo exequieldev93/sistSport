@@ -29,13 +29,12 @@ class CategoriaController extends Controller
             ->orderBy('id','desc')
             ->paginate(7);
 
+
             if($request->exists('pdf')){
                 
                     return $this->download($categorias);
             }
   
-            
-            
             return view('almacen.categoria.index',["categorias"=>$categorias,"searchText"=>$query]);
         }
     }

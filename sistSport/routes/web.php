@@ -17,3 +17,9 @@ Route::get('/', function () {
 
 Route::resource('almacen/categoria','CategoriaController');
 Route::resource('almacen/prenda','PrendaController');
+Route::resource('configuracion/tienda','EmpresaController');
+Route::resource('acceso/rol','RolController');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

@@ -12,12 +12,14 @@ class Prenda extends Model
 
     protected $filelable=[
         'idCategoria',
+        'idColor',
+        'idTalle',
+        'idMaterial',
         'nombre',
-        'talle',
-        'marca',
-        'color',
-        'estado',
-        'imagen'
+        'detalle',
+        'imagen',
+        'estado'
+        
     ];
 
     protected $guarded = [
