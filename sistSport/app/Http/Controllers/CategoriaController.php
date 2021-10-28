@@ -54,14 +54,14 @@ class CategoriaController extends Controller
     }
 
     public function show($id){
-        $categoria=DB::table('categorias')->where('idcategoria','=',$id);
+        $categoria=DB::table('categorias')->where('idCategoria','=',$id);
         
         return view("almacen.categoria.show",["categoria"=>$categoria]);
     }
 
     public function edit($id){
         $categoria=DB::table('categorias')->find($id);
-        
+       // dd($categoria);
         return view("almacen.categoria.edit",["categoria"=>$categoria]);
     }
     

@@ -29,25 +29,25 @@ class ColorController extends Controller
             ->orderBy('id','desc')
             ->paginate(7);
 
-
+            
             if($request->exists('pdf')){
                 
-                    return $this->download($categorias);
+                    return $this->download($colores);
             }
   
-            return view('almacen.colores.index',["colores"=>$categorias,"searchText"=>$query]);
+            return view('almacen.color.index',["colores"=>$colores,"searchText"=>$query]);
         }
     }
 
     public function create(){
-            return view('almacen.colores.create');
+            return view('almacen.color.create');
     }
 
-    public function store(ColorFormResquest $request){
-            $categoria = new Color;
-            $categoria->nombre=$request->get('nombre');
-            $categoria->condicion='1';
-            $categoria->save();
+    public function store(ColorFormRequest $request){
+            $color = new Color;
+            $color->nombre=$request->get('nombre');
+            $color->condicion='1';
+            $color->save();
 
             return Redirect::to('almacen/color');
     }
@@ -64,18 +64,19 @@ class ColorController extends Controller
         return view("almacen.color.edit",["color"=>$categoria]);
     }
     
-    public function update(CategoriaFormResquest $request,$id){
-        $categoria=Color::FindOrFail($id);
-        $categoria->nombre=$request->get('nombre');
-        $categoria->update();
+    public function update(ColorFormResquest $request,$id){
+        $color=Color::FindOrFail($id);
+        $color->nombre=$request->get('nombre');
+        $color->descripcion=$request->get('descripcion');
+        $color->update();
 
         return Redirect::to('almacen/color');
     }
 
     public function destroy($id){
-        $categoria=Color::FindOrFail($id);
-        $categoria->condicion='0';
-        $categoria->update();
+        $color=Color::FindOrFail($id);
+        $color->condicion='0';
+        $color->update();
         return Redirect::to('almacen/color');
     }
 

@@ -43,7 +43,7 @@ class TalleController extends Controller
             return view('almacen.talle.create');
     }
 
-    public function store(CategoriaFormResquest $request){
+    public function store(TalleFormRequest $request){
             $talle = new Talle;
             $talle->unidad=$request->get('unidad');
             $talle->condicion='1';
@@ -59,12 +59,12 @@ class TalleController extends Controller
     }
 
     public function edit($id){
-        $categoria=DB::table('talles')->find($id);
+        $talle=DB::table('talles')->find($id);
         
         return view("almacen.talle.edit",["talle"=>$talle]);
     }
     
-    public function update(TalleFormResquest $request,$id){
+    public function update(TalleFormRequest $request,$id){
         $categoria=Talle::FindOrFail($id);
         $categoria->unidad=$request->get('unidad');
         $categoria->update();

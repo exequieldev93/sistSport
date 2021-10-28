@@ -96,7 +96,9 @@
               <ul class="treeview-menu">
                 <li><a href="{{url('almacen/prenda')}}"><i class="fa fa-circle-o"></i> Prendas</a></li>
                 <li><a href="{{url('almacen/categoria')}}"><i class="fa fa-circle-o"></i> Categorías</a></li>
+                <li><a href="{{url('almacen/color')}}"><i class="fa fa-circle-o"></i> Color</a></li>
                 <li><a href="{{url('almacen/talle')}}"><i class="fa fa-circle-o"></i> Talle</a></li>
+                <li><a href="{{url('almacen/material')}}"><i class="fa fa-circle-o"></i>Material</a></li>
               </ul>
             </li>
             

@@ -2,7 +2,7 @@
 @section('contenido')
    <div class="row">
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-            <h3>Editar Categoria: {{$categoria->nombre}}</h3>
+            <h3>Editar Material: {{$material->nombre}}</h3>
             @if (count($errors)>0)
             <div class="alert alert-danger">
                 <ul>
@@ -14,11 +14,11 @@
             </div>
             @endif
 
-            {!!Form::model($categoria,['method'=>'PATCH','route'=>['categoria.update',$categoria->id]])!!}
+            {!!Form::model($material,['method'=>'PATCH','route'=>['material.update',$material->id]])!!}
             {{Form::token()}}
             <div class="form-group">
                 <label for="nombre">Nombre</label>
-                <input type="text" name="nombre" class="fort-control" value="{{$categoria->nombre}}" placeholder="Nombre....">
+                <input type="text" name="nombre" class="fort-control" value="{{$material->nombre}}" placeholder="Nombre....">
             </div>
             <div class="form-group">
                 <button class="btn btn-primary" type="submit">Guardar</button>

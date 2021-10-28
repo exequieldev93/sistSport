@@ -7,7 +7,7 @@ use Barryvdh\DomPDF\Facade as PDF;
 use App\Http\Requests;
 use App\Material;
 use Illuminate\Support\Facades\Redirect;
-use App\Http\Requests\MaterialFormResquest;
+use App\Http\Requests\MaterialFormRequest;
 use DB;
 
 class MaterialController extends Controller
@@ -43,11 +43,11 @@ class MaterialController extends Controller
             return view('almacen.material.create');
     }
 
-    public function store(MaterialFormResquest $request){
+    public function store(MaterialFormRequest $request){
             $material = new Material;
             $material->nombre=$request->get('nombre');
             $material->condicion='1';
-            $categoria->save();
+            $material->save();
 
             return Redirect::to('almacen/material');
     }
@@ -64,7 +64,7 @@ class MaterialController extends Controller
         return view("almacen.material.edit",["material"=>$material]);
     }
     
-    public function update(MaterialFormResquest $request,$id){
+    public function update(MaterialFormRequest $request,$id){
         $material=Material::FindOrFail($id);
         $material->nombre=$request->get('nombre');
         $material->update();
