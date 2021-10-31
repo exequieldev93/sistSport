@@ -27,13 +27,26 @@ class PrendaController extends Controller
             //Consulta a la base de datos
             $prendas=DB::table('prendas as p')
             ->join('categorias as c','p.idCategoria','=','c.id')
-            ->select('p.id as idPrendas','p.idCategoria','p.nombre','p.talle','p.color','p.imagen','c.nombre as categoria','p.estado')
+            ->join('colores as col','p.idColor','=','col.id')
+            ->join('talles as t','p.idTalle','=','t.id')
+            ->join('materiales as m','p.idMaterial','=','m.id')
+            ->select(
+                    'p.id as idPrendas',
+                    'c.nombre as categoria',
+                    'col.nombre as color',
+                    't.unidad as talle',
+                    'm.nombre as material',
+                    'p.nombre',
+                    'p.detalle',
+                    'p.imagen',
+                    'p.estado'
+                    )
             ->where('p.nombre','LIKE','%'.$query.'%')
             ->orwhere('c.nombre','LIKE','%'.$query.'%')
             ->orderBy('p.id','desc')
             ->paginate(7);
             
-
+            //dd($prendas);
             if($request->exists('pdf')){
                 $empresa = Empresa::findOrFail(23);
                 return $this->download($prendas,$empresa);
@@ -45,7 +58,10 @@ class PrendaController extends Controller
 
     public function create(){
             $categorias=DB::table('categorias')->where('condicion','=','1')->get();
-            return view('almacen.prenda.create',["categorias"=>$categorias]);
+            $colores=DB::table('colores')->where('condicion','=','1')->get();
+            $talles=DB::table('talles')->where('condicion','=','1')->get();
+            $materiales=DB::table('materiales')->where('condicion','=','1')->get();
+            return view('almacen.prenda.create',["categorias"=>$categorias,"colores"=>$colores,"talles"=>$talles,"materiales"=>$materiales]);
     }
 
     public function store(PrendaFormRequest $request){
@@ -53,10 +69,12 @@ class PrendaController extends Controller
             $prendas = new Prenda;
             $prendas->idCategoria=$request->get('idCategoria');
             $prendas->nombre=$request->get('nombre');
-            $prendas->talle=$request->get('talle');
-            $prendas->color=$request->get('color');
+            $prendas->idColor=$request->get('idColor');
+            $prendas->idTalle=$request->get('idTalle');
+            $prendas->idMaterial=$request->get('idMaterial');
+            $prendas->detalle=$request->get('detalle');
             $prendas->estado='Activo';
-           
+            
             if($request->hasfile('imagen')!=null){
                 $file=$request->file('imagen');
                 $file->move(public_path().'\imagenes\prendas\\',$file->getClientOriginalName());
@@ -85,7 +103,7 @@ class PrendaController extends Controller
         $prenda->idCategoria=$request->get('idCategoria');
         $prenda->nombre=$request->get('nombre');
         $prenda->talle=$request->get('talle');
-        
+        $prenda->detalle=$request->get('detalle');
         $prenda->color=$request->get('color');
         $prenda->estado='Activo';
         

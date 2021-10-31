@@ -26,8 +26,9 @@ class PrendaFormRequest extends FormRequest
         return [
             'idCategoria'=>'required',
             'nombre' =>'required|max:45',
-            'talle' =>'required|max:45',
-            'color' => 'max:45',
+            'idTalle' =>'required|max:45',
+            'idColor' => 'max:45',
+            'idMaterial' => 'max:45',
             'estado'=> 'max:15',
             
 

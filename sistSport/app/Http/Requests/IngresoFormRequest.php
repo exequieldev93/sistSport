@@ -25,8 +25,8 @@ class IngresoFormRequest extends FormRequest
     {
         return [
             'idProveedor'=>'requiered',
-            'num_comprobante' => 'required',
-            
+            'cantidad'=>'required',
+            'precio'=>'requiered'            
         ];
     }
 }

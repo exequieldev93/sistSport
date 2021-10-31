@@ -31,7 +31,9 @@
                     <th>Categoria</th>
                     <th>Nombre</th>
                     <th>Color</th>
+                    <th>Detalle</th>
                     <th>Talle</th>
+                    <th>Material</th>
                     <th>Estado</th>
                     <th>Opciones</th>
                 </thead>
@@ -43,7 +45,9 @@
                         <td>{{$pre->categoria}}</td>
                         <td>{{$pre->nombre}}</td>
                         <td>{{$pre->color}}</td>
+                        <td>{{$pre->detalle}}</td>
                         <td>{{$pre->talle}}</td>
+                        <td>{{$pre->material}}</td>
                         <td>{{$pre->estado}}</td>
                         
                         <td>

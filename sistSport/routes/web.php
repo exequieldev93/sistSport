@@ -22,6 +22,7 @@ Route::resource('almacen/categoria','CategoriaController');
 Route::resource('almacen/color','ColorController');
 Route::resource('almacen/talle','TalleController');
 Route::resource('almacen/material','MaterialController');
+Route::resource('compra/ingreso','IngresoController');
 
 Route::resource('configuracion/tienda','EmpresaController');
 Route::resource('acceso/rol','RolController');
