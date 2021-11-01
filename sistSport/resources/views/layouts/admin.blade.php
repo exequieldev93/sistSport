@@ -109,8 +109,8 @@
                  <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
-                <li><a href="../compra/ingreso"><i class="fa fa-circle-o"></i> Ingresos</a></li>
-                <li><a href="../compra/proveedor"><i class="fa fa-circle-o"></i> Proveedores</a></li>
+                <li><a href="{{url('compra/ingreso')}}"><i class="fa fa-circle-o"></i> Ingresos</a></li>
+                <li><a href="{{url('compra/ingreso')}}"><i class="fa fa-circle-o"></i> Proveedores</a></li>
               </ul>
             </li>
             <li class="treeview">
@@ -218,6 +218,7 @@
       
     <!-- jQuery 2.1.4 -->
     <script src="{{asset('js/jQuery-2.1.4.min.js')}}"></script>
+    @stack('scripts')
     <!-- Bootstrap 3.3.5 -->
     <script src="{{asset('js/bootstrap.min.js')}}"></script>
     <script src="{{asset('boostrap4/js/bootstrap.min.css')}}"></script>

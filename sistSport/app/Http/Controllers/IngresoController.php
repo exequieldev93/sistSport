@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Input;
-use App\Http\Requests\CategoriaFormResquest;
+use App\Http\Requests\IngresoFormRequest;
 use App\Ingreso;
-use App\DeatalleIngreso;
+use App\DetalleIngresos;
 use DB;
 
 use Carbon\Carbon;
@@ -29,15 +29,7 @@ class IngresoController extends Controller
             $query=trim($request->get('searchText'));
 
             //Consulta a la base de datos
-            /*
-            $ingresos=DB::table('ingresos as i')
-            ->join('empresas as e','i.idProveedor','=','e.id')
-            ->join('detalle_ingresos as di','i.id','=','di.idIngreso')
-            ->select('i.id as ingreso','i.fecha_hora','a.nombre','i.estado',DB::raw('sum(di.cantidad*di.precio) as total'))
-            ->orderBy('ingreso','desc')
-            ->groupBy('i.id as ingreso','i.fecha_hora','a.nombre','i.estado')
-            ->paginate(7);*/
-
+            
             $ingresos=DB::table('ingresos as i')
             ->join('empresas as e','i.idProveedor','=','e.id')
             ->join('detalle_ingresos as di','di.idIngreso','=','i.id')
@@ -51,15 +43,16 @@ class IngresoController extends Controller
             ->orderBy('i.id','desc')
             ->groupBy('i.id','i.fecha','i.fecha','i.estado','e.nombre')
             ->paginate(7);
-
-
+            
+            
+            
             //dd($ingresos);
 
             if($request->exists('pdf')){
                 
                     return $this->download($ingreso);
             }
-  
+
             return view('compra.ingreso.index',["ingresos"=>$ingresos,"searchText"=>$query]);
         }
     }
@@ -69,48 +62,59 @@ class IngresoController extends Controller
         $empresas=DB::table('empresas')
                 ->where('tipo','=',1)->get();
 
+        $marcas=DB::table('marcas')->where('condicion','=',1)->get();
+       
         $prendas = DB::table('prendas as pre')
         ->join('categorias as c','c.id','=','pre.idCategoria')
         ->join('colores as co','co.id','=','pre.idColor')
         ->select(
-                DB::raw('CONCAT(c.nombre," ",co.nombre) as prendas'),
+                DB::raw('CONCAT(c.nombre," ",pre.nombre," ",co.nombre," ",pre.detalle) as prendas'),
                 'pre.id as idPrenda'
                 )
         ->where('pre.estado','=','Activo')
         ->get();
 
         
-        return view('compra.ingreso.create',["empresas"=>$empresas,"prendas"=>$prendas]);
+        return view('compra.ingreso.create',["empresas"=>$empresas,"prendas"=>$prendas,"marcas"=>$marcas]);
     }
 
     public function store(IngresoFormRequest $request){
-        
+        //dd($request);
         try {
             DB::beginTransaction();
             $ingreso = new Ingreso;
-            $ingreso->idProveedor = $request->get('idProveedor');
+           
+            $ingreso->idProveedor=$request->get('idProveedor');
             $ingreso->fecha=$request->get('fecha');
-            $ingreso->estado = 1;
+            $ingreso->estado=1;
             $ingreso->save();
+            
 
-            $idprenda = $request->get('idPrenda');
+            $idprenda = $request->get('idprenda');
+            $idmarca = $request->get('idmarca');
             $cantidad = $request->get('cantidad');
             $precio = $request->get('precio');
+            
+            
 
             $cont = 0;
+            
+            while($cont < count($idprenda)){
 
-            while($cont < count($idPrenda)){
-                $detalle = new DetalleIngreso();
-                $detalle->idIngreso=$ingreso->id;
-                $detalle->idPrenda=$idprenda[$cont];
-                $detalle->idTalle=$idtalle[$cont];
-                $detalle->precio=$precio[$cont];
+                $detalles = new DetalleIngresos();
+                $detalles->idIngreso=$ingreso->id;
+                $detalles->idPrenda=$idprenda[$cont];
+                $detalles->idMarca=$idmarca[$cont];
+                $detalles->cantidad=$cantidad[$cont];
+                $detalles->precio=$precio[$cont];
+                $detalles->save();
                 $cont=$cont+1;
+
             }
 
             DB::commit();
-        } catch (\Exception $e) {
-            DB:: rollnack();
+        } catch (Exception $e) {
+            DB:: rollback();
         }
 
         return Redirect::to('compra/ingreso');
@@ -119,18 +123,27 @@ class IngresoController extends Controller
     public function show($id){
         $ingreso=DB::table('ingresos as i')
             ->join('empresas as e','i.idProveedor','=','e.id')
-            ->join('detalle_ingresos as di','i.id','=','di.idIngreso')
-            ->select('i.id as ingreso','i.fecha_hora','a.nombre','i.estado',DB::raw('sum(di.cantidad*di.precio) as total'))
-            ->where('idIngreso','=',$id)
+            ->join('detalle_ingresos as di','di.idIngreso','=','i.id')
+            ->select(
+                        'i.id',
+                        'i.fecha',
+                        'e.nombre',
+                        'i.estado',
+                        DB::raw('sum(di.cantidad*di.precio) as total'))
+            ->where('i.id','=',$id)
+            ->groupBy('i.id','i.fecha','i.estado','e.nombre')
             ->first();
-
-        $detalle=DB::table('detalle_ingreso as d')
+       
+        $detalles=DB::table('detalle_ingresos as d')
             ->join('prendas as p','d.idPrenda','=','p.id')
-            ->select('a.nombre as prenda','d.cantidad','d.precio')
+            ->select(
+                    'p.nombre as prenda',
+                    'd.cantidad',
+                    'd.precio')
             ->where('d.idIngreso','=',$id)
             ->get();
         
-        return view("compra.ingreso.show",["ingreso"=>$ingreso,"detalle"=>$detalle]);
+        return view("compra.ingreso.show",["ingreso"=>$ingreso,"detalles"=>$detalles]);
     }
 
 
